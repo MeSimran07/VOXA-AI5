@@ -54,10 +54,8 @@
   - [Frontend Setup (Next.js)](#frontend-setup-nextjs)
 - [9. Environment Variables Reference](#9-environment-variables-reference)
 - [10. API Specification & Endpoints](#10-api-specification--endpoints)
-- [11. College Presentation & Viva Defense Cheat Sheet](#11-college-presentation--viva-defense-cheat-sheet)
-- [12. Troubleshooting & Diagnostics](#12-troubleshooting--diagnostics)
-- [13. Deployment Strategy](#13-deployment-strategy)
-- [14. Academic & Project Metadata](#14-academic--project-metadata)
+- [11. Troubleshooting & Diagnostics](#12-troubleshooting--diagnostics)
+- [12. Academic & Project Metadata](#14-academic--project-metadata)
 
 ---
 
