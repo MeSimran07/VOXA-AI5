@@ -512,30 +512,7 @@ All endpoints are self-documenting via FastAPI at `/docs`. Below is the core rou
 | **Metrics**| `GET` | `/api/analytics/summary`| Retrieve user token usage analytics | `Bearer JWT` |
 | **Health**| `GET` | `/health` | Live probe checking PostgreSQL status | Public |
 
----
-
-## 11. College Presentation & Viva Defense Cheat Sheet
-
-Be prepared to answer these common technical questions from college examiners or hackathon juries:
-
-#### Q1: "Why did you choose a dual-server architecture (FastAPI + Next.js) instead of Next.js alone?"
-> **Answer:** "Next.js is optimal for UI rendering, server components, and client caching. However, enterprise AI backends require robust Python machine learning libraries (`google-genai`, `alembic`, `asyncpg`), asynchronous connection pooling, and granular token-bucket rate limiting. Decoupling them allows independent horizontal scaling and ensures backend logic remains framework-agnostic."
-
-#### Q2: "How does VOXA AI handle document Q&A without causing context window overflow or token depletion?"
-> **Answer:** "When a user uploads a PDF or DOCX file, text extraction runs through `pdf2json` or `mammoth`. Before injecting text into the prompt context, our pipeline sanitizes redundant whitespace and enforces a 5,000-character budget. This guarantees the prompt fits within fast-inference token limits and saves API cost while retaining the core semantic context."
-
-#### Q3: "What happens if the Google Gemini API hits a rate limit or experiences an outage?"
-> **Answer:** "We implemented an automated provider fallback mechanism in `app/services/ai.py`. When an API call to Gemini fails with a rate limit (HTTP 429) or connection error, the service catches the exception and transparently attempts execution against OpenAI's GPT-4o API. The end-user experiences zero session interruption."
-
-#### Q4: "How is user data and password security handled?"
-> **Answer:** "Passwords are salt-hashed using the `bcrypt` algorithm via `passlib` before ever touching the database. User sessions are verified via stateless JWT bearer tokens signed with a 256-bit secret key (`HS256`). Database access is strictly parameterized through SQLAlchemy 2.0 ORM, eliminating SQL injection vulnerabilities."
-
-#### Q5: "How does the animated Robot Avatar sync with voice interactions?"
-> **Answer:** "The `RobotAvatar` component is an interactive SVG state machine built in React. It tracks voice state flags (`idle`, `listening`, `speaking`, `thinking`). When voice input or audio playback begins, dynamic SVG transform matrices and opacity transitions simulate real-time mouth movement and reactive eye visualizer pulses."
-
----
-
-## 12. Troubleshooting & Diagnostics
+## 11. Troubleshooting & Diagnostics
 
 | Symptom | Probable Cause | Exact Solution |
 | :--- | :--- | :--- |
@@ -547,29 +524,12 @@ Be prepared to answer these common technical questions from college examiners or
 
 ---
 
-## 13. Deployment Strategy
-
-### Frontend Deployment (Vercel)
-1. Push repository to GitHub.
-2. Import project on [Vercel](https://vercel.com).
-3. Set **Root Directory** to `frontend`.
-4. Add Environment Variable:
-   - `NEXT_PUBLIC_API_URL` = Your production FastAPI URL (e.g. `https://voxa-api.onrender.com`).
-5. Click **Deploy**.
-
-### Backend Deployment (Render / Railway / AWS EC2)
-1. Deploy as a Python Web Service from the `backend` directory.
-2. **Build Command:** `pip install -r requirements.txt`
-3. **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
-4. Configure all environment variables from `backend/.env.example`.
-5. Set `FRONTEND_URL` to your production Vercel domain.
+n.
 
 ---
 
-## 14. Academic & Project Metadata
+# 12. Academic & Project Metadata
 
 - **Project Title:** VOXA AI — Next-Generation Conversational AI Platform
 - **Organization / Developed By:** Meander Software Private Limited
-- **Project Report Reference:** [`Project_Report.md`](Project_Report.md)
-- **License:** Proprietary / Academic Evaluation. *(For open-source distribution, recommend [MIT License](https://opensource.org/licenses/MIT)).*
 - **Acknowledgements:** [FastAPI](https://fastapi.tiangolo.com/), [Next.js](https://nextjs.org/), [SQLAlchemy](https://www.sqlalchemy.org/), [Tailwind CSS](https://tailwindcss.com/), [Google Generative AI](https://ai.google.dev/).
