@@ -84,3 +84,19 @@ class MemoryGraphResponse(BaseModel):
     nodes: List[MemoryGraphNode]
     links: List[MemoryGraphLink]
     stats: dict
+
+class ExamMapRequest(BaseModel):
+    exam: str
+
+class ExamMapResponse(BaseModel):
+    success: bool = True
+    exam: str
+    preparation_score: int
+    readiness_level: str
+    summary: str
+    total_searches_found: int
+    domains: List[dict]
+    nodes: List[dict]
+    links: List[dict]
+    previous_searches: List[dict]
+    recommended_next_topics: List[str]

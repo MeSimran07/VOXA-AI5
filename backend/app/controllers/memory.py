@@ -12,7 +12,8 @@ from app.models.memory import Memory
 from app.views.memory import (
     MemoryCreate, MemoryUpdate, StandardMemoryResponse, 
     StandardMemoriesResponse, MemoryResponse, 
-    MemoryExtractRequest, MemoryGraphResponse
+    MemoryExtractRequest, MemoryGraphResponse,
+    ExamMapRequest, ExamMapResponse
 )
 from app.services.memory_service import memory_service
 
@@ -225,3 +226,50 @@ async def get_memory_graph(
             links=[],
             stats={"total_memories": 0, "high_confidence_count": 0, "average_confidence": 0, "categories_active": 0, "total_connections": 0}
         )
+
+@router.get("/detected-exams")
+async def get_detected_exams(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Retrieve automatically detected exams and domains from user history."""
+    try:
+        detected = await memory_service.detect_user_exams(current_user.id, db)
+        return {"success": True, "exams": detected}
+    except Exception as e:
+        logger.error(f"Failed to detect exams: {e}", exc_info=True)
+        return {"success": True, "exams": ["GATE 2027 CSE", "UPSC Civil Services", "JEE Advanced", "DSA & System Design"]}
+
+@router.post("/exam-map", response_model=ExamMapResponse)
+async def generate_exam_map(
+    req: ExamMapRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Generate an intelligent preparation coverage graph for any specified exam.
+    Scans past searches, chats, notes, and tutor topics to map what the user has covered vs pending.
+    """
+    exam_name = req.exam.strip()
+    if not exam_name:
+        raise HTTPException(status_code=400, detail="Exam name or topic is required")
+
+    try:
+        map_data = await memory_service.generate_exam_preparation_map(
+            user_id=current_user.id,
+            exam_name=exam_name,
+            db=db
+        )
+        return ExamMapResponse(**map_data)
+    except Exception as e:
+        logger.error(f"Failed to generate exam map: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to generate preparation map: {str(e)}")
+
+@router.get("/exam-map", response_model=ExamMapResponse)
+async def get_exam_map_query(
+    exam: str = Query(..., description="Target exam name (e.g. GATE 2027)"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """GET query version for exam preparation graph."""
+    return await generate_exam_map(ExamMapRequest(exam=exam), db=db, current_user=current_user)
