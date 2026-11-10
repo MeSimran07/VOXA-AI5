@@ -10,3 +10,4 @@ from .notification import Notification
 from .setting import Setting
 from .analytics import Analytics
 from .folder import Folder
+from .memory import Memory

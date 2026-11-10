@@ -45,6 +45,26 @@ async def lifespan(app: FastAPI):
                 await conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS file_size INTEGER;"))
                 await conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS extracted_text TEXT;"))
                 await conn.execute(text("ALTER TABLE documents ADD COLUMN IF NOT EXISTS chat_id VARCHAR;"))
+                await conn.execute(text("""
+                    CREATE TABLE IF NOT EXISTS memories (
+                        id VARCHAR(64) PRIMARY KEY,
+                        user_id VARCHAR(64) NOT NULL,
+                        category VARCHAR(50) NOT NULL DEFAULT 'fact',
+                        subject VARCHAR(255) NOT NULL,
+                        predicate VARCHAR(100) NOT NULL DEFAULT 'relates_to',
+                        object_value TEXT NOT NULL,
+                        confidence_score FLOAT NOT NULL DEFAULT 0.85,
+                        source VARCHAR(50) NOT NULL DEFAULT 'explicit_user',
+                        source_chat_id VARCHAR(64),
+                        is_active BOOLEAN NOT NULL DEFAULT TRUE,
+                        access_count INTEGER NOT NULL DEFAULT 0,
+                        tags VARCHAR(255) DEFAULT '',
+                        last_accessed_at TIMESTAMP WITH TIME ZONE,
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                        updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+                        is_deleted BOOLEAN DEFAULT FALSE
+                    );
+                """))
         except Exception as e:
             logger.error(f"Database initialization failed: {e}")
     yield
@@ -126,7 +146,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from app.controllers import auth, chat, media, ai_tutor, voice, analytics, presentations, notes, documents, settings, notifications
+from app.controllers import auth, chat, media, ai_tutor, voice, analytics, presentations, notes, documents, settings, notifications, memory
 app.include_router(auth.router)
 app.include_router(chat.router)
 app.include_router(media.router)
@@ -138,6 +158,7 @@ app.include_router(notes.router)
 app.include_router(documents.router)
 app.include_router(settings.router)
 app.include_router(notifications.router)
+app.include_router(memory.router)
 
 from app.controllers import health
 app.include_router(health.router)

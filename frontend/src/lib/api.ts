@@ -86,6 +86,13 @@ export const api = {
       method: 'PUT',
       body: JSON.stringify(data)
     }),
+
+  patch: <T>(endpoint: string, data?: any, options?: RequestOptions) => 
+    fetchApi<T>(endpoint, { 
+      ...options, 
+      method: 'PATCH',
+      body: data !== undefined ? JSON.stringify(data) : undefined
+    }),
     
   delete: <T>(endpoint: string, options?: RequestOptions) => 
     fetchApi<T>(endpoint, { ...options, method: 'DELETE' }),

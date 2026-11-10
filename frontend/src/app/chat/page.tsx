@@ -22,6 +22,7 @@ import { api } from "@/lib/api"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
 import { getLocalActivities } from "@/lib/activityLogger"
+import { ContactProModal } from "@/components/landing/ContactProModal"
 
 const featureCards = [
   { title: "AI Chat", desc: "Interact with advanced AI models", icon: MessageSquare, color: "bg-indigo-500", link: "/chat/ai-chat" },
@@ -48,6 +49,7 @@ export default function DashboardPage() {
   const router = useRouter()
   const { user } = useAuthStore()
   const displayUsername = user?.name || user?.email?.split('@')[0] || "Guest"
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false)
   const [recentActivities, setRecentActivities] = useState<any[]>([])
   const [usageData, setUsageData] = useState([
     { name: 'Mon', queries: 0, storage: 0 },
@@ -268,20 +270,40 @@ export default function DashboardPage() {
                 </Button>
               </motion.div>
 
-              {/* Quick Access */}
-              <motion.div variants={itemVariants} className="bg-gradient-to-br from-indigo-900/40 to-purple-900/40 border border-indigo-500/30 rounded-none p-6 relative overflow-hidden shadow-sm">
+              {/* Quick Access Pro Upgrade */}
+              <motion.div variants={itemVariants} className="bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border border-indigo-500/40 rounded-none p-6 relative overflow-hidden shadow-sm">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-[40px] pointer-events-none" />
-                <h2 className="text-lg font-bold text-white mb-2">Upgrade to Pro</h2>
-                <p className="text-sm text-indigo-200 mb-6 max-w-[200px]">Unlock GPT-4, DALL-E 3, and unlimited API usage.</p>
-                <Button className="w-full bg-white text-indigo-950 hover:bg-neutral-200 rounded-none font-bold shadow-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h2 className="text-lg font-bold text-white">Upgrade to Pro</h2>
+                  <span className="text-[11px] font-mono bg-indigo-500/20 text-indigo-300 px-2 py-0.5 border border-indigo-500/30">
+                    ₹299/mo
+                  </span>
+                </div>
+                <p className="text-xs text-indigo-200 mb-5 leading-relaxed">
+                  Unlock GPT-4, presentation generator, unlimited docs & priority AI speed.
+                </p>
+                <Button 
+                  onClick={() => setIsUpgradeModalOpen(true)}
+                  className="w-full bg-white text-indigo-950 hover:bg-neutral-200 rounded-none font-bold text-xs shadow-lg transition-all active:scale-95"
+                >
                   Upgrade Now
                 </Button>
+                <p className="text-[10px] text-center text-indigo-300/80 mt-2">
+                  WhatsApp: 6280642187 • Email: s6899878@gmail.com
+                </p>
               </motion.div>
 
             </div>
           </div>
         </motion.div>
       </main>
+
+      {/* Upgrade Pro Modal */}
+      <ContactProModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        initialMode="pro"
+      />
     </div>
   )
 }

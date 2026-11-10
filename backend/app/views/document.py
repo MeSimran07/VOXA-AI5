@@ -14,13 +14,13 @@ class DocumentCreate(BaseModel):
 class DocumentResponse(BaseModel):
     id: str
     filename: str
-    file_size: Optional[int]
-    file_type: Optional[str]
-    chat_id: Optional[str]
+    file_size: Optional[int] = None
+    file_type: Optional[str] = None
+    chat_id: Optional[str] = None
     extracted_text: Optional[str] = None
-    cloudinary_url: Optional[str]
-    cloudinary_public_id: Optional[str]
-    created_at: datetime
+    cloudinary_url: Optional[str] = None
+    cloudinary_public_id: Optional[str] = None
+    created_at: Optional[datetime] = None
     
     class Config:
         from_attributes = True

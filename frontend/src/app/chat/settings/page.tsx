@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { useTheme } from "@/components/theme-provider"
 import { clearLocalActivities } from "@/lib/activityLogger"
+import { ContactProModal, WhatsAppIcon } from "@/components/landing/ContactProModal"
 
 interface UserSettings {
   id: string
@@ -57,6 +58,8 @@ export default function SettingsPage() {
   // Storage Stats State
   const [totalFilesCount, setTotalFilesCount] = useState(0)
   const [totalStorageBytes, setTotalStorageBytes] = useState(0)
+  const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false)
+  const [modalMode, setModalMode] = useState<"pro" | "team" | "contact">("pro")
 
   useEffect(() => {
     fetchSettingsAndStats()
@@ -678,14 +681,68 @@ export default function SettingsPage() {
                         </div>
                       </div>
 
+                      {/* Pro Plan Section */}
+                      <div className="bg-gradient-to-r from-indigo-950/60 to-purple-950/60 border border-indigo-500/30 p-5 space-y-3 rounded-none">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-xs uppercase tracking-wider text-indigo-400 font-bold">Subscription Plan</span>
+                            <h3 className="text-base font-bold text-white mt-0.5">Voxa AI Pro Edition</h3>
+                          </div>
+                          <span className="text-sm font-mono font-bold text-white bg-indigo-500/20 px-3 py-1 border border-indigo-500/40">
+                            ₹299 / month
+                          </span>
+                        </div>
+                        <p className="text-xs text-neutral-300 leading-relaxed">
+                          For instant activation or converting your account to Pro, message us on WhatsApp (<span className="text-emerald-400 font-mono">6280642187</span>) or send an email to <span className="text-indigo-400 font-mono">s6899878@gmail.com</span>.
+                        </p>
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          <Button 
+                            className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs h-9 rounded-none font-semibold"
+                            onClick={() => window.open('https://wa.me/916280642187?text=Hello! I want to upgrade to Voxa AI Pro (₹299/mo).', '_blank')}
+                          >
+                            <WhatsAppIcon className="w-3.5 h-3.5 mr-2" /> WhatsApp to Upgrade
+                          </Button>
+                          <Button 
+                            className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs h-9 rounded-none font-semibold"
+                            onClick={() => {
+                              setModalMode("pro");
+                              setIsUpgradeModalOpen(true);
+                            }}
+                          >
+                            <Mail className="w-3.5 h-3.5 mr-2" /> Upgrade Details
+                          </Button>
+                        </div>
+                      </div>
+
                       <div className="pt-4 border-t border-neutral-800 space-y-3">
                         <h3 className="text-xs font-semibold text-neutral-200">Support & Help Center</h3>
+                        <p className="text-xs text-neutral-400">
+                          Need technical assistance or have inquiries? Reach out through our official direct channels:
+                        </p>
                         <div className="flex flex-wrap gap-3">
-                          <Button variant="secondary" className="bg-neutral-800 hover:bg-neutral-700 text-white text-xs h-9 rounded-none border border-neutral-700" onClick={() => window.open('https://github.com', '_blank')}>
-                            <HelpCircle className="w-3.5 h-3.5 mr-2" /> Documentation
+                          <Button 
+                            variant="secondary" 
+                            className="bg-emerald-950/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-500/30 text-xs h-9 rounded-none" 
+                            onClick={() => window.open('https://wa.me/916280642187', '_blank')}
+                          >
+                            <WhatsAppIcon className="w-3.5 h-3.5 mr-2" /> WhatsApp: 6280642187
                           </Button>
-                          <Button variant="secondary" className="bg-neutral-800 hover:bg-neutral-700 text-white text-xs h-9 rounded-none border border-neutral-700" onClick={() => window.location.href = 'mailto:support@voxa.ai'}>
-                            <Mail className="w-3.5 h-3.5 mr-2" /> Contact Support
+                          <Button 
+                            variant="secondary" 
+                            className="bg-neutral-800 hover:bg-neutral-700 text-white text-xs h-9 rounded-none border border-neutral-700" 
+                            onClick={() => window.location.href = 'mailto:s6899878@gmail.com?subject=Voxa AI Support Inquiry'}
+                          >
+                            <Mail className="w-3.5 h-3.5 mr-2" /> s6899878@gmail.com
+                          </Button>
+                          <Button 
+                            variant="secondary" 
+                            className="bg-neutral-800 hover:bg-neutral-700 text-white text-xs h-9 rounded-none border border-neutral-700" 
+                            onClick={() => {
+                              setModalMode("contact");
+                              setIsUpgradeModalOpen(true);
+                            }}
+                          >
+                            <HelpCircle className="w-3.5 h-3.5 mr-2" /> Contact Modal
                           </Button>
                         </div>
                       </div>
@@ -732,6 +789,13 @@ export default function SettingsPage() {
 
         </div>
       </main>
+
+      {/* Contact & Pro Modal */}
+      <ContactProModal
+        isOpen={isUpgradeModalOpen}
+        onClose={() => setIsUpgradeModalOpen(false)}
+        initialMode={modalMode}
+      />
     </div>
   )
 }

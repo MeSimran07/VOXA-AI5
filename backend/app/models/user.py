@@ -20,3 +20,4 @@ class User(TimestampMixin, Base):
     notes = relationship("Note", back_populates="user", cascade="all, delete-orphan")
     settings = relationship("Setting", back_populates="user", uselist=False, cascade="all, delete-orphan")
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
+    memories = relationship("Memory", back_populates="user", cascade="all, delete-orphan")

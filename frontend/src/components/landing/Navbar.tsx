@@ -3,17 +3,15 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, Menu, X, Phone, PhoneCall, Copy, Check, MessageSquare } from "lucide-react";
+import { Mic, Menu, X, Phone, Mail, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ContactProModal } from "./ContactProModal";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [contactModalOpen, setContactModalOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const phoneNumber = "6280642187";
-  const formattedPhone = "+91 62806 42187";
+  const [modalMode, setModalMode] = useState<"pro" | "team" | "contact">("contact");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,10 +21,10 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleCopyNumber = () => {
-    navigator.clipboard.writeText(phoneNumber);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
+  const openContact = (mode: "pro" | "team" | "contact" = "contact") => {
+    setModalMode(mode);
+    setContactModalOpen(true);
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -56,25 +54,49 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop Nav - Contact Only */}
-          <div className="hidden md:flex items-center gap-8">
-            <button
-              onClick={() => setContactModalOpen(true)}
-              className="flex items-center gap-2 text-sm font-semibold text-neutral-300 hover:text-white transition-all px-4 py-2 rounded-full hover:bg-white/5 border border-transparent hover:border-violet-500/30 group"
+          {/* Desktop Nav - Matching screenshot navigation */}
+          <div className="hidden md:flex items-center gap-7">
+            <Link 
+              href="#features" 
+              className="text-sm font-medium text-neutral-300 hover:text-white transition-colors"
             >
-              <Phone className="h-4 w-4 text-violet-400 group-hover:scale-110 transition-transform" />
+              Features
+            </Link>
+            
+            <Link 
+              href="#pricing" 
+              className="text-sm font-medium text-neutral-300 hover:text-white transition-colors flex items-center gap-1.5"
+            >
+              <span>Pricing</span>
+              <span className="text-[10px] font-mono bg-violet-500/20 text-violet-300 px-1.5 py-0.2 rounded-full border border-violet-500/30">
+                ₹299
+              </span>
+            </Link>
+
+            <Link 
+              href="/chat/docs" 
+              className="text-sm font-medium text-neutral-300 hover:text-white transition-colors"
+            >
+              Docs
+            </Link>
+
+            <button
+              onClick={() => openContact("contact")}
+              className="flex items-center gap-2 text-sm font-semibold text-neutral-300 hover:text-white transition-all px-3 py-1.5 rounded-full hover:bg-white/5 border border-transparent hover:border-violet-500/30 group"
+            >
+              <Phone className="h-3.5 w-3.5 text-violet-400 group-hover:scale-110 transition-transform" />
               <span>Contact</span>
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
             </button>
             
-            <div className="flex items-center gap-4 border-l border-white/10 pl-8">
+            <div className="flex items-center gap-3 border-l border-white/10 pl-6">
               <Link href="/auth">
-                <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white rounded-full px-6 transition-all hover-lift">
+                <Button variant="ghost" className="text-white hover:bg-white/10 hover:text-white rounded-full px-5 text-sm transition-all hover-lift">
                   Login
                 </Button>
               </Link>
               <Link href="/auth">
-                <Button className="bg-white text-black hover:bg-neutral-200 rounded-full px-6 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.5)] transition-all hover-lift">
+                <Button className="bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-full px-6 text-sm font-semibold shadow-lg shadow-violet-500/25 transition-all hover-lift">
                   Get Started
                 </Button>
               </Link>
@@ -100,31 +122,55 @@ export function Navbar() {
               exit={{ opacity: 0, height: 0 }}
               className="md:hidden bg-background/95 backdrop-blur-xl border-b border-white/10 overflow-hidden"
             >
-              <div className="flex flex-col p-6 gap-4">
-                <button 
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    setContactModalOpen(true);
-                  }}
-                  className="flex items-center justify-between text-lg font-medium text-white py-3 border-b border-white/10 w-full text-left"
+              <div className="flex flex-col p-6 gap-3">
+                <Link
+                  href="#features"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-base font-medium text-neutral-200 py-2 border-b border-white/5"
                 >
-                  <span className="flex items-center gap-3">
-                    <Phone className="h-5 w-5 text-violet-400" />
-                    Contact
+                  Features
+                </Link>
+
+                <Link
+                  href="#pricing"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between text-base font-medium text-neutral-200 py-2 border-b border-white/5"
+                >
+                  <span>Pricing</span>
+                  <span className="text-xs bg-violet-500/20 text-violet-300 px-2 py-0.5 rounded-full">
+                    ₹299/mo
+                  </span>
+                </Link>
+
+                <Link
+                  href="/chat/docs"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-base font-medium text-neutral-200 py-2 border-b border-white/5"
+                >
+                  Docs
+                </Link>
+
+                <button 
+                  onClick={() => openContact("contact")}
+                  className="flex items-center justify-between text-base font-medium text-white py-2 border-b border-white/5 w-full text-left"
+                >
+                  <span className="flex items-center gap-2">
+                    <Phone className="h-4 w-4 text-violet-400" />
+                    Contact & Pro Support
                   </span>
                   <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-mono">
-                    Available
+                    WhatsApp • Call
                   </span>
                 </button>
 
-                <div className="flex flex-col gap-3 mt-2">
+                <div className="flex flex-col gap-2.5 mt-3">
                   <Link href="/auth" onClick={() => setMobileMenuOpen(false)}>
                     <Button variant="outline" className="w-full border-white/20 text-white rounded-xl bg-transparent">
                       Login
                     </Button>
                   </Link>
                   <Link href="/auth" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full bg-white text-black hover:bg-neutral-200 rounded-xl">
+                    <Button className="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-semibold">
                       Get Started
                     </Button>
                   </Link>
@@ -135,110 +181,12 @@ export function Navbar() {
         </AnimatePresence>
       </motion.nav>
 
-      {/* Contact Details Modal */}
-      <AnimatePresence>
-        {contactModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setContactModalOpen(false)}
-              className="absolute inset-0 bg-black/80 backdrop-blur-md"
-            />
-
-            {/* Modal Box */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ type: "spring", duration: 0.5, bounce: 0.2 }}
-              className="relative w-full max-w-md bg-neutral-950/95 border border-white/15 rounded-3xl p-6 shadow-2xl shadow-violet-500/10 overflow-hidden"
-            >
-              {/* Decorative top glow */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-1 bg-gradient-to-r from-transparent via-violet-500 to-transparent" />
-
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-violet-500/20 border border-violet-500/40 flex items-center justify-center text-violet-400">
-                    <PhoneCall className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-white">Contact & Connect</h3>
-                    <p className="text-xs text-neutral-400">Get in touch directly with our team</p>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setContactModalOpen(false)}
-                  className="h-8 w-8 rounded-full bg-white/5 hover:bg-white/10 text-neutral-400 hover:text-white flex items-center justify-center transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-
-              {/* Phone display card */}
-              <div className="bg-neutral-900/80 border border-white/10 rounded-2xl p-5 mb-5 flex flex-col items-center justify-center text-center relative overflow-hidden">
-                <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 mb-1">
-                  <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                  Direct Phone Support
-                </div>
-                <div className="text-2xl font-black tracking-wider text-white font-mono mt-1 mb-1">
-                  {formattedPhone}
-                </div>
-                <div className="text-xs text-neutral-400">
-                  Raw: <span className="font-mono text-neutral-300">{phoneNumber}</span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="grid grid-cols-1 gap-3">
-                {/* Call Now */}
-                <a
-                  href={`tel:${phoneNumber}`}
-                  className="flex items-center justify-center gap-2 w-full py-3.5 px-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white rounded-xl font-semibold shadow-lg shadow-violet-600/25 transition-all active:scale-[0.98]"
-                >
-                  <Phone className="h-4 w-4" />
-                  Call Directly ({phoneNumber})
-                </a>
-
-                {/* WhatsApp Chat */}
-                <a
-                  href={`https://wa.me/91${phoneNumber}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-xl font-medium transition-all"
-                >
-                  <MessageSquare className="h-4 w-4" />
-                  Chat on WhatsApp
-                </a>
-
-                {/* Copy Number */}
-                <button
-                  onClick={handleCopyNumber}
-                  className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white border border-white/10 rounded-xl text-sm font-medium transition-all"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="h-4 w-4 text-emerald-400" />
-                      <span className="text-emerald-400 font-semibold">Number Copied to Clipboard!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4 text-neutral-400" />
-                      Copy Phone Number
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="mt-5 text-center text-[11px] text-neutral-500">
-                VOXA AI Support • Available 24/7 for Inquiries & Demos
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
+      {/* Reusable Contact & Pro Upgrade Modal */}
+      <ContactProModal
+        isOpen={contactModalOpen}
+        onClose={() => setContactModalOpen(false)}
+        initialMode={modalMode}
+      />
     </>
   );
 }

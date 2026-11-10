@@ -12,9 +12,14 @@ from app.views.chat import (
     ChatCreate, ChatRequest, StandardChatResponse, 
     StandardChatsResponse, StandardMessageResponse, ChatResponse
 )
-from app.services.ai import ai_service
+from app.services.ai import ai_service, SYSTEM_PROMPT
 from app.services.ollama import ollama_service
+from app.services.memory_service import memory_service
+from app.models.memory import Memory
 from app.core.limiter import limiter
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/chats", tags=["Chats"])
 
@@ -89,7 +94,16 @@ async def send_message(
     except Exception as e:
         print(f"Failed to record chat activity: {e}")
 
-    # 3. Call AI Service (Ollama strictly for Document Analyzer, default AI for other features)
+    # 3. Retrieve Personalized Memory Graph context
+    memory_context = ""
+    try:
+        memory_context = await memory_service.get_personalized_context(current_user.id, db)
+    except Exception as mem_err:
+        logger.warning(f"Could not load personal memory context: {mem_err}")
+
+    personalized_system_prompt = f"{SYSTEM_PROMPT}\n\n{memory_context}" if memory_context else SYSTEM_PROMPT
+
+    # 4. Call AI Service (Ollama strictly for Document Analyzer, default AI for other features)
     is_doc = chat_req.is_doc_chat or (chat.title and chat.title.startswith("Doc: ")) or (chat_req.provider == "ollama")
 
     if is_doc:
@@ -103,20 +117,58 @@ async def send_message(
             err_msg = getattr(e, 'detail', str(e))
             # Fallback to default AI if Ollama local server is offline
             try:
-                ai_response_text = await ai_service.generate_response(chat_req.message, chat_history=chat.messages)
+                ai_response_text = await ai_service.generate_response(
+                    chat_req.message, 
+                    chat_history=chat.messages,
+                    system_prompt=personalized_system_prompt
+                )
             except Exception:
                 ai_response_text = f"Document Analyzer: {err_msg}"
     else:
         try:
-            ai_response_text = await ai_service.generate_response(chat_req.message, chat_history=chat.messages)
+            ai_response_text = await ai_service.generate_response(
+                chat_req.message, 
+                chat_history=chat.messages,
+                system_prompt=personalized_system_prompt
+            )
         except Exception as e:
             err_msg = getattr(e, 'detail', str(e))
             ai_response_text = f"Your query has been safely saved to your history. Note: AI generation encountered an issue ({err_msg}). Please check your API key in .env if you wish to generate new responses."
 
-    # 4. Save AI response
+    # 5. Save AI response
     ai_msg = Message(chat_id=chat.id, role="assistant", content=ai_response_text)
     db.add(ai_msg)
     await db.commit()
     await db.refresh(ai_msg)
+
+    # 6. Background auto-extraction for personal memory graph
+    try:
+        lower_msg = chat_req.message.lower()
+        should_extract = (
+            chat_req.message.startswith("/remember ") or
+            any(k in lower_msg for k in ["preparing for", "my goal", "i prefer", "remember that", "i am learning", "i work on", "i am working on", "my project", "i live in", "my exam", "i know", "i am preparing"])
+        )
+        if should_extract:
+            clean_text = chat_req.message.replace("/remember ", "").strip()
+            user_display = current_user.name or current_user.email.split('@')[0]
+            extracted = await memory_service.extract_memories_from_text(clean_text, user_name=user_display)
+            for item in extracted:
+                mem = Memory(
+                    user_id=current_user.id,
+                    category=item["category"],
+                    subject=item["subject"],
+                    predicate=item["predicate"],
+                    object_value=item["object_value"],
+                    confidence_score=item["confidence_score"],
+                    source="chat_extraction",
+                    source_chat_id=chat.id,
+                    tags=item.get("tags", ""),
+                    is_active=True
+                )
+                db.add(mem)
+            if extracted:
+                await db.commit()
+    except Exception as extract_err:
+        logger.warning(f"Auto memory extraction note: {extract_err}")
     
     return StandardMessageResponse(data=ai_msg)

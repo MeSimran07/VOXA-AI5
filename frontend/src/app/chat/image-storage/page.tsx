@@ -41,9 +41,8 @@ export default function ImageStoragePage() {
         )
         setImages(imageDocs)
       }
-    } catch (e) {
-      console.error("Failed to load images", e)
-      toast.error("Failed to load your images.")
+    } catch (e: any) {
+      console.warn("Could not load images:", e?.message || e)
     } finally {
       setIsLoading(false)
     }

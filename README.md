@@ -12,7 +12,6 @@
   <img src="https://img.shields.io/badge/Project_Type-Full--Stack_AI_Platform-7928CA?style=for-the-badge&logo=rocket" alt="Full Stack AI" />
   <img src="https://img.shields.io/badge/Architecture-MVC_%2B_Async_Engine-0070F3?style=for-the-badge" alt="MVC" />
   <img src="https://img.shields.io/badge/Status-Tested_%26_Production_Ready-success?style=for-the-badge" alt="Status" />
-  <img src="https://img.shields.io/badge/Hackathon_Ready-Yes-ff69b4?style=for-the-badge" alt="Hackathon Ready" />
 </p>
 
 <p align="center">
@@ -28,7 +27,7 @@
 
 ---
 
-## 📌 Quick Pitch & Presentation Summary
+## 📌 Project Overview
 
 | Attribute | Details |
 | :--- | :--- |
@@ -54,8 +53,8 @@
   - [Frontend Setup (Next.js)](#frontend-setup-nextjs)
 - [9. Environment Variables Reference](#9-environment-variables-reference)
 - [10. API Specification & Endpoints](#10-api-specification--endpoints)
-- [11. Troubleshooting & Diagnostics](#12-troubleshooting--diagnostics)
-- [12. Academic & Project Metadata](#14-academic--project-metadata)
+- [11. Troubleshooting & Diagnostics](#11-troubleshooting--diagnostics)
+- [12. Project Metadata & License](#12-project-metadata--license)
 
 ---
 
@@ -135,6 +134,12 @@ How VOXA AI compares to typical chatbot wrappers and existing platforms:
 ### Module 6: Telemetry, Usage Analytics & Command Palette
 - **Usage Telemetry:** Real-time metrics on token consumption and activity frequency visualised with `Recharts`.
 - **Keyboard-First Navigation:** Global `Ctrl + K` (or `Cmd + K`) command palette built with `cmdk` for fast sub-millisecond route transitions.
+
+### Module 7: Self-Improving AI with a Personal Memory Graph (Innovation 1)
+- **Persistent Personal Memory:** Automatically extracts and links user goals (e.g. GATE 2027), preferences, skills, constraints, and ongoing projects into a structured PostgreSQL knowledge graph.
+- **Dynamic Context Injection:** Transparently augments AI system prompts with confirmed memories so users never need to re-explain their background.
+- **Memory Confidence Index:** Distinguishes explicit user statements (95-98% confidence) from AI inferences, with a control panel allowing users to inspect, verify, pause, or delete any memory node.
+- **Interactive Radial Mind Graph:** Real-time SVG topology visualization connecting user mind node to clustered dimension hubs.
 
 ---
 
@@ -264,7 +269,7 @@ async def generate_response(prompt, context):
 
 ```text
 VOXA AI 3/
-├── README.md                 # Master Project Documentation & Presentation Guide
+├── README.md                 # Master Project Documentation
 ├── Project_Report.md         # Official Technical Specification Report
 │
 ├── backend/                  # FastAPI Application (MVC Structure)
@@ -507,9 +512,16 @@ All endpoints are self-documenting via FastAPI at `/docs`. Below is the core rou
 | **Slides**| `POST` | `/api/presentations/generate` | Generate multi-slide deck from prompt | `Bearer JWT` |
 | **Notes** | `GET` | `/api/notes` | List saved notes with tags | `Bearer JWT` |
 | **Notes** | `POST` | `/api/notes` | Create a new note | `Bearer JWT` |
+| **Memory**| `GET` | `/api/memories` | List active memories with search & category filters | `Bearer JWT` |
+| **Memory**| `POST` | `/api/memories` | Create a persistent memory node | `Bearer JWT` |
+| **Memory**| `PUT` | `/api/memories/{id}` | Update memory / adjust confidence score | `Bearer JWT` |
+| **Memory**| `DELETE`| `/api/memories/{id}` | Remove knowledge node from memory graph | `Bearer JWT` |
+| **Memory**| `GET` | `/api/memories/graph` | Fetch graph nodes & links for 2D visualization | `Bearer JWT` |
+| **Memory**| `POST` | `/api/memories/extract` | Auto-extract memories from user text | `Bearer JWT` |
 | **Metrics**| `GET` | `/api/analytics/summary`| Retrieve user token usage analytics | `Bearer JWT` |
 | **Health**| `GET` | `/health` | Live probe checking PostgreSQL status | Public |
 
+---
 ## 11. Troubleshooting & Diagnostics
 
 | Symptom | Probable Cause | Exact Solution |
@@ -522,12 +534,14 @@ All endpoints are self-documenting via FastAPI at `/docs`. Below is the core rou
 
 ---
 
-n.
-
----
-
-# 12. Academic & Project Metadata
+## 12. Project Metadata & License
 
 - **Project Title:** VOXA AI — Next-Generation Conversational AI Platform
 - **Organization / Developed By:** Meander Software Private Limited
+- **Official Contact & Pro Upgrade Support:**
+  - **Email:** [`s6899878@gmail.com`](mailto:s6899878@gmail.com)
+  - **WhatsApp / Phone:** [`+91 62806 42187`](https://wa.me/916280642187)
+  - **Pro Plan:** ₹299 / month (Unlock GPT-4, presentations, unlimited docs)
+- **Project Report Reference:** [`Project_Report.md`](Project_Report.md)
+- **License:** MIT License
 - **Acknowledgements:** [FastAPI](https://fastapi.tiangolo.com/), [Next.js](https://nextjs.org/), [SQLAlchemy](https://www.sqlalchemy.org/), [Tailwind CSS](https://tailwindcss.com/), [Google Generative AI](https://ai.google.dev/).

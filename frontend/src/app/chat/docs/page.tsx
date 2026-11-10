@@ -51,8 +51,8 @@ export default function DocAnalyzerPage() {
           }));
           setDocuments(formatted);
         }
-      } catch (e) {
-        console.error("Failed to load documents", e);
+      } catch (e: any) {
+        console.warn("Notice: Document list temporarily unavailable:", e?.message || e);
       }
     };
 
